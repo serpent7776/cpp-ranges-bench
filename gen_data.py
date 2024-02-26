@@ -7,7 +7,7 @@ fake = Faker()
 NUM_ROWS = 10000
 
 with open('data.csv', 'w', newline='') as csvfile:
-    csv_writer = csv.writer(csvfile)
+    csv_writer = csv.writer(csvfile, lineterminator="\n")
 
     csv_writer.writerow(['Id', 'Username', 'Connected Names'])
 
