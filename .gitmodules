@@ -1,0 +1,3 @@
+[submodule "lib/ranges-v3"]
+	path = lib/ranges-v3
+	url = https://github.com/ericniebler/range-v3.git
