@@ -13,6 +13,13 @@
 #include <ranges>
 #include <concepts>
 
+#include <boost/range/algorithm.hpp>
+#include <boost/range/adaptor/indexed.hpp>
+#include <boost/range/adaptor/filtered.hpp>
+#include <boost/range/adaptor/sliced.hpp>
+#include <boost/range/adaptor/reversed.hpp>
+#include <boost/range/algorithm/copy.hpp>
+
 #include "catch_amalgamated.hpp"
 
 struct Data
@@ -162,6 +169,21 @@ std::vector<Out> algorithms(const std::vector<Data>& v, std::predicate<Data> aut
 	return found;
 }
 
+std::vector<Out> boost_adaptors(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
+{
+	namespace ba = boost::adaptors;
+
+	std::vector<Data> filtered;
+	std::vector<Out> found;
+	filtered.reserve(v.size());
+	boost::copy(v | ba::filtered(accept), std::back_inserter(filtered));
+	const auto r = filtered | ba::sliced(0, std::min(max_items, filtered.size())) | ba::indexed(0) | ba::reversed;
+	boost::transform(r, std::back_inserter(found), [](const auto it) {
+		return Out{.n=uint64_t(it.index()), .id=it.value().id, .name=it.value().name};
+	});
+	return found;
+}
+
 TEST_CASE("all ismiths", "") {
 	const auto needle = "ismith";
 	const auto str = read_file("data.csv");
@@ -187,6 +209,10 @@ TEST_CASE("all ismiths", "") {
 	};
 	BENCHMARK("algorithms") {
 		const std::vector<Out> found = algorithms(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
+	BENCHMARK("boost adaptors") {
+		const std::vector<Out> found = boost_adaptors(data, accept, max_items);
 		REQUIRE(found == expected);
 	};
 }
