@@ -20,6 +20,14 @@
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/range/algorithm/copy.hpp>
 
+#include "range/v3/action/reverse.hpp"
+#include "range/v3/functional/not_fn.hpp"
+#include "range/v3/view/enumerate.hpp"
+#include "range/v3/view/filter.hpp"
+#include "range/v3/view/reverse.hpp"
+#include "range/v3/view/take.hpp"
+#include "range/v3/view/transform.hpp"
+
 #include "catch_amalgamated.hpp"
 
 struct Data
@@ -184,6 +192,18 @@ std::vector<Out> boost_adaptors(const std::vector<Data>& v, std::predicate<Data>
 	return found;
 }
 
+std::vector<Out> rangesv3(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
+{
+	namespace rv = ranges::views;
+	namespace ra = ranges::action;
+
+	const auto r = v | rv::remove_if(ranges::not_fn(accept)) | rv::take(max_items) | rv::enumerate | ranges::to_vector | ra::reverse;
+	std::vector<Out> found = r | ranges::views::transform([](const auto& it){
+		return Out{.n=it.first, .id=it.second.id, .name=it.second.name};
+	}) | ranges::to_vector;
+	return found;
+}
+
 TEST_CASE("all ismiths", "") {
 	const auto needle = "ismith";
 	const auto str = read_file("data.csv");
@@ -213,6 +233,10 @@ TEST_CASE("all ismiths", "") {
 	};
 	BENCHMARK("boost adaptors") {
 		const std::vector<Out> found = boost_adaptors(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
+	BENCHMARK("ranges v3") {
+		const std::vector<Out> found = rangesv3(data, accept, max_items);
 		REQUIRE(found == expected);
 	};
 }
