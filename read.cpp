@@ -204,6 +204,24 @@ std::vector<Out> rangesv3(const std::vector<Data>& v, std::predicate<Data> auto 
 	return found;
 }
 
+template<typename Range, typename Container = std::vector<std::ranges::range_value_t<Range>>>
+Container into(Range&& range) {
+	Container result;
+	// result.reserve(std::ranges::size(range));
+	std::ranges::copy(range, std::back_inserter(result));
+	return result;
+}
+
+std::vector<Out> stdranges(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
+{
+	namespace rv = std::ranges::views;
+
+	std::vector<Out> found = into(v | rv::filter(accept) | rv::take(max_items) | rv::enumerate) | rv::reverse | rv::transform([](const auto& it){
+		return Out{.n=uint64_t(std::get<0>(it)), .id=std::get<1>(it).id, .name=std::get<1>(it).name};
+	}) | ranges::to_vector;
+	return found;
+}
+
 TEST_CASE("all ismiths", "") {
 	const auto needle = "ismith";
 	const auto str = read_file("data.csv");
@@ -237,6 +255,10 @@ TEST_CASE("all ismiths", "") {
 	};
 	BENCHMARK("ranges v3") {
 		const std::vector<Out> found = rangesv3(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
+	BENCHMARK("std::range") {
+		const std::vector<Out> found = stdranges(data, accept, max_items);
 		REQUIRE(found == expected);
 	};
 }
