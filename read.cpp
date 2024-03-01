@@ -28,6 +28,8 @@
 #include "range/v3/view/take.hpp"
 #include "range/v3/view/transform.hpp"
 
+#include "lib/flux.hpp"
+
 #include "catch_amalgamated.hpp"
 
 struct Data
@@ -222,6 +224,16 @@ std::vector<Out> stdranges(const std::vector<Data>& v, std::predicate<Data> auto
 	return found;
 }
 
+std::vector<Out> fluxranges(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
+{
+	auto filtered = flux::from(std::move(v)).filter(accept).take(max_items);
+	auto zipped = flux::zip(flux::ints(), std::move(filtered)).template to<std::vector>();
+	std::vector<Out> found = flux::from(std::move(zipped)).reverse().map([](const auto& it){
+		return Out{.n=uint64_t(std::get<0>(it)), .id=std::get<1>(it).id, .name=std::get<1>(it).name};
+	}).template to<std::vector>();
+	return found;
+}
+
 TEST_CASE("all ismiths", "") {
 	const auto needle = "ismith";
 	const auto str = read_file("data.csv");
@@ -259,6 +271,10 @@ TEST_CASE("all ismiths", "") {
 	};
 	BENCHMARK("std::range") {
 		const std::vector<Out> found = stdranges(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
+	BENCHMARK("flux ranges") {
+		const std::vector<Out> found = fluxranges(data, accept, max_items);
 		REQUIRE(found == expected);
 	};
 }
