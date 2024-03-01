@@ -278,3 +278,38 @@ TEST_CASE("all ismiths", "") {
 		REQUIRE(found == expected);
 	};
 }
+
+TEST_CASE("5 ismiths", "") {
+	const auto needle = "ismith";
+	const auto str = read_file("data.csv");
+	const auto data = parse(str);
+	auto accept = [=](const Data& d){return std::find(std::begin(d.connections), std::end(d.connections), needle) != std::end(d.connections);};
+	const size_t max_items = 5;
+	const std::vector<Out> expected = {
+		{4, 2047, "marcramos"},
+		{3, 1354, "christopher75"},
+		{2, 976, "stephanie34"},
+		{1, 827, "melanievance"},
+		{0, 708, "campbelljennifer"},
+	};
+	BENCHMARK("algorithms") {
+		const std::vector<Out> found = algorithms(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
+	BENCHMARK("boost adaptors") {
+		const std::vector<Out> found = boost_adaptors(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
+	BENCHMARK("ranges v3") {
+		const std::vector<Out> found = rangesv3(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
+	BENCHMARK("std::range") {
+		const std::vector<Out> found = stdranges(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
+	BENCHMARK("flux ranges") {
+		const std::vector<Out> found = fluxranges(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
+}
