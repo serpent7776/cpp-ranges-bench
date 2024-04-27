@@ -382,6 +382,10 @@ TEST_CASE("early single item", "") {
 	const std::vector<Out> expected = {
 		{0, 2, "elizabeth25"},
 	};
+	BENCHMARK("cc") {
+		const std::vector<Out> found = cc(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
 	BENCHMARK("algorithms") {
 		const std::vector<Out> found = algorithms(data, accept, max_items);
 		REQUIRE(found == expected);
