@@ -202,7 +202,7 @@ std::vector<Out> boost_adaptors(const std::vector<Data>& v, std::predicate<Data>
 
 	std::vector<Data> filtered;
 	std::vector<Out> found;
-	filtered.reserve(v.size());
+	filtered.reserve(std::min(max_items, v.size()));
 	boost::copy(v | ba::filtered(accept), std::back_inserter(filtered));
 	const auto r = filtered | ba::sliced(0, std::min(max_items, filtered.size())) | ba::indexed(0) | ba::reversed;
 	boost::transform(r, std::back_inserter(found), [](const auto it) {
