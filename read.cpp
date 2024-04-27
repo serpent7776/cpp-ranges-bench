@@ -158,6 +158,22 @@ std::vector<Data> parse(std::string_view in)
 	return vec;
 }
 
+std::vector<Out> cc(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
+{
+	size_t idx = 0;
+	std::vector<Out> result;
+	result.reserve(std::min(max_items, v.size()));
+	for (const Data& it : v) {
+		if (accept(it)) // filter
+		{
+			result.emplace_back(idx, it.id, it.name);
+			if (++idx >= max_items) break; // take
+		}
+	}
+	std::reverse(std::begin(result), std::end(result));
+	return result;
+}
+
 std::vector<Out> algorithms(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
 {
 	std::vector<size_t> idxs;
@@ -257,6 +273,10 @@ TEST_CASE("all ismiths", "") {
 		{1, 827, "melanievance"},
 		{0, 708, "campbelljennifer"},
 	};
+	BENCHMARK("cc") {
+		const std::vector<Out> found = cc(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
 	BENCHMARK("algorithms") {
 		const std::vector<Out> found = algorithms(data, accept, max_items);
 		REQUIRE(found == expected);
@@ -292,6 +312,10 @@ TEST_CASE("5 ismiths", "") {
 		{1, 827, "melanievance"},
 		{0, 708, "campbelljennifer"},
 	};
+	BENCHMARK("cc") {
+		const std::vector<Out> found = cc(data, accept, max_items);
+		REQUIRE(found == expected);
+	};
 	BENCHMARK("algorithms") {
 		const std::vector<Out> found = algorithms(data, accept, max_items);
 		REQUIRE(found == expected);
@@ -321,6 +345,10 @@ TEST_CASE("empty result set", "") {
 	auto accept = [=](const Data& d){return std::find(std::begin(d.connections), std::end(d.connections), needle) != std::end(d.connections);};
 	const size_t max_items = 5;
 	const std::vector<Out> expected = {
+	};
+	BENCHMARK("cc") {
+		const std::vector<Out> found = cc(data, accept, max_items);
+		REQUIRE(found == expected);
 	};
 	BENCHMARK("algorithms") {
 		const std::vector<Out> found = algorithms(data, accept, max_items);
