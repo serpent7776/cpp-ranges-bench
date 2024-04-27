@@ -1,7 +1,7 @@
 CXXFLAGS+=-std=c++23 -Wall -Wextra -pedantic -O2 -g -I lib/ranges-v3/include
 
 all: read
-	./read
+	./read --reporter xml > results.xml
 
 read.o: lib/flux.hpp rangesv3
 
