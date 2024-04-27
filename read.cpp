@@ -443,3 +443,45 @@ TEST_CASE("late single item", "") {
 	};
 }
 
+TEST_CASE("every other element", "") {
+	const auto str = read_file("data.csv");
+	const auto data = parse(str);
+	auto accept = [=](const Data& d){return d.id % 2 == 0 && std::all_of(std::begin(d.connections), std::end(d.connections), [](std::string_view c){return c.length() > 1;});};
+	const size_t max_items = 9999;
+	BENCHMARK("cc") {
+		const std::vector<Out> found = cc(data, accept, max_items);
+		REQUIRE(found.size() == 5000);
+		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
+		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
+	};
+	BENCHMARK("algorithms") {
+		const std::vector<Out> found = algorithms(data, accept, max_items);
+		REQUIRE(found.size() == 5000);
+		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
+		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
+	};
+	BENCHMARK("boost adaptors") {
+		const std::vector<Out> found = boost_adaptors(data, accept, max_items);
+		REQUIRE(found.size() == 5000);
+		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
+		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
+	};
+	BENCHMARK("ranges v3") {
+		const std::vector<Out> found = rangesv3(data, accept, max_items);
+		REQUIRE(found.size() == 5000);
+		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
+		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
+	};
+	BENCHMARK("std::range") {
+		const std::vector<Out> found = stdranges(data, accept, max_items);
+		REQUIRE(found.size() == 5000);
+		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
+		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
+	};
+	BENCHMARK("flux ranges") {
+		const std::vector<Out> found = fluxranges(data, accept, max_items);
+		REQUIRE(found.size() == 5000);
+		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
+		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
+	};
+}
