@@ -443,7 +443,7 @@ TEST_CASE("late single item", "") {
 	};
 }
 
-TEST_CASE("every other element", "") {
+TEST_CASE("every other item", "") {
 	const auto str = read_file("data.csv");
 	const auto data = parse(str);
 	auto accept = [=](const Data& d){return d.id % 2 == 0 && std::all_of(std::begin(d.connections), std::end(d.connections), [](std::string_view c){return c.length() > 1;});};
