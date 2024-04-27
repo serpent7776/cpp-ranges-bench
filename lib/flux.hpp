@@ -308,8 +308,8 @@ struct indexed_bounds_check_fn {
                 }
             }
 #endif
-            assert_fn{}(idx >= T{0}, "index cannot be negative", std::move(loc));
-            assert_fn{}(idx < limit, "out-of-bounds sequence access", std::move(loc));
+            assert_fn{}(idx >= T{0}, "index cannot be negative", loc);
+            assert_fn{}(idx < limit, "out-of-bounds sequence access", loc);
         }
     }
 };
@@ -3377,12 +3377,22 @@ struct for_each_while_fn {
         if constexpr (requires { traits_t<Seq>::for_each_while(seq, std::move(pred)); }) {
             return traits_t<Seq>::for_each_while(seq, std::move(pred));
         } else {
-            auto cur = first(seq);
-            while (!is_last(seq, cur)) {
-                if (!std::invoke(pred, read_at(seq, cur))) { break; }
-                inc(seq, cur);
+            if constexpr (multipass_sequence<Seq> && bounded_sequence<Seq>) {
+                auto cur = first(seq);
+                auto end = last(seq);
+                while (cur != end) {
+                    if (!std::invoke(pred, read_at(seq, cur))) { break; }
+                    inc(seq, cur);
+                }
+                return cur;
+            } else {
+                auto cur = first(seq);
+                while (!is_last(seq, cur)) {
+                    if (!std::invoke(pred, read_at(seq, cur))) { break; }
+                    inc(seq, cur);
+                }
+                return cur;
             }
-            return cur;
         }
     }
 };
@@ -3792,11 +3802,12 @@ public:
             while (cur != end) {
                 flux::dec(self.base_, cur);
                 if (!std::invoke(pred, flux::read_at(self.base_, cur))) {
+                    flux::inc(self.base_, cur);
                     break;
                 }
             }
 
-            return cursor_type(flux::inc(self.base_, cur));
+            return cursor_type(cur);
         }
     };
 };
@@ -4337,7 +4348,7 @@ public:
     {
         cursor_type out{flux::first(self.base_), };
 
-        for (auto i : flux::iota(std::size_t{1}, std::size_t{N})) {
+        FLUX_FOR(auto i, flux::iota(std::size_t{1}, std::size_t{N})) {
             out.arr[i] = out.arr[i - 1];
             if (!flux::is_last(self.base_, out.arr[i])) {
                 flux::inc(self.base_, out.arr[i]);
@@ -4364,7 +4375,7 @@ public:
         cursor_type out{};
         out.arr.back() = flux::last(self.base_);
         auto const first = flux::first(self.base_);
-        for (auto i : flux::iota(std::size_t{0}, std::size_t{N}-1).reverse()) {
+        FLUX_FOR(auto i, flux::iota(std::size_t{0}, std::size_t{N}-1).reverse()) {
             out.arr[i] = out.arr[i + 1];
             if (out.arr[i] != first) {
                 flux::dec(self.base_, out.arr[i]);
@@ -5177,9 +5188,20 @@ public:
     static constexpr auto last(Self& self) -> cursor_t<Self>
         requires cartesian_is_bounded<Bases...>
     {
-        auto cur = first(self);
-        std::get<0>(cur) = flux::last(get_base<0>(self));
-        return cur;
+        if constexpr (CartesianKind == cartesian_kind::product) {
+            auto cur = first(self);
+            bool any_is_empty = std::apply([](auto& /*ignored*/, auto&... bases) {
+                    return (flux::is_empty(bases) || ...);
+                }, self.bases_);
+            if (!any_is_empty) {
+                std::get<0>(cur) = flux::last(get_base<0>(self));
+            }
+            return cur;
+        } else {
+            auto cur = first(self);
+            std::get<0>(cur) = flux::last(get_base<0>(self));
+            return cur;
+        }
     }
 
     template <typename Self>
