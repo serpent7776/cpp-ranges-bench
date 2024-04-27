@@ -188,6 +188,7 @@ std::vector<Out> algorithms(const std::vector<Data>& v, std::predicate<Data> aut
 	const auto limited = std::min(filtered, f+max_items);
 	const auto size = std::distance(f, limited);
 	std::vector<Out> found;
+	found.reserve(std::min(max_items, v.size()));
 	// enumerate+reverse
 	std::transform(std::rend(idxs)-size, std::rend(idxs), std::back_inserter(found), [&, n=static_cast<uint64_t>(0)](size_t idx)mutable{
 		return Out{.n=size-(++n), .id=v[idx].id, .name=v[idx].name};
