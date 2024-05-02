@@ -274,30 +274,48 @@ TEST_CASE("all ismiths", "") {
 		{1, 827, "melanievance"},
 		{0, 708, "campbelljennifer"},
 	};
-	BENCHMARK("cc") {
+	{
 		const std::vector<Out> found = cc(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("algorithms") {
+		BENCHMARK("cc") {
+			return cc(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = algorithms(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("boost adaptors") {
+		BENCHMARK("algorithms") {
+			return algorithms(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = boost_adaptors(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("ranges v3") {
+		BENCHMARK("boost adaptors") {
+			return boost_adaptors(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = rangesv3(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("std::range") {
+		BENCHMARK("ranges v3") {
+			return rangesv3(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = stdranges(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("flux ranges") {
+		BENCHMARK("std::range") {
+			return stdranges(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = fluxranges(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
+		BENCHMARK("flux ranges") {
+			return fluxranges(data, accept, max_items);
+		};
+	}
 }
 
 TEST_CASE("5 ismiths", "") {
@@ -313,30 +331,48 @@ TEST_CASE("5 ismiths", "") {
 		{1, 827, "melanievance"},
 		{0, 708, "campbelljennifer"},
 	};
-	BENCHMARK("cc") {
+	{
 		const std::vector<Out> found = cc(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("algorithms") {
+		BENCHMARK("cc") {
+			return cc(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = algorithms(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("boost adaptors") {
+		BENCHMARK("algorithms") {
+			return algorithms(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = boost_adaptors(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("ranges v3") {
+		BENCHMARK("boost adaptors") {
+			return boost_adaptors(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = rangesv3(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("std::range") {
+		BENCHMARK("ranges v3") {
+			return rangesv3(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = stdranges(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("flux ranges") {
+		BENCHMARK("std::range") {
+			return stdranges(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = fluxranges(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
+		BENCHMARK("flux ranges") {
+			return fluxranges(data, accept, max_items);
+		};
+	}
 }
 
 TEST_CASE("empty result set", "") {
@@ -347,30 +383,48 @@ TEST_CASE("empty result set", "") {
 	const size_t max_items = 5;
 	const std::vector<Out> expected = {
 	};
-	BENCHMARK("cc") {
+	{
 		const std::vector<Out> found = cc(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("algorithms") {
+		BENCHMARK("cc") {
+			return cc(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = algorithms(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("boost adaptors") {
+		BENCHMARK("algorithms") {
+			return algorithms(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = boost_adaptors(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("ranges v3") {
+		BENCHMARK("boost adaptors") {
+			return boost_adaptors(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = rangesv3(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("std::range") {
+		BENCHMARK("ranges v3") {
+			return rangesv3(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = stdranges(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("flux ranges") {
+		BENCHMARK("std::range") {
+			return stdranges(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = fluxranges(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
+		BENCHMARK("flux ranges") {
+			return fluxranges(data, accept, max_items);
+		};
+	}
 }
 
 TEST_CASE("early single item", "") {
@@ -382,30 +436,48 @@ TEST_CASE("early single item", "") {
 	const std::vector<Out> expected = {
 		{0, 2, "elizabeth25"},
 	};
-	BENCHMARK("cc") {
+	{
 		const std::vector<Out> found = cc(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("algorithms") {
+		BENCHMARK("cc") {
+			return cc(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = algorithms(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("boost adaptors") {
+		BENCHMARK("algorithms") {
+			return algorithms(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = boost_adaptors(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("ranges v3") {
+		BENCHMARK("boost adaptors") {
+			return boost_adaptors(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = rangesv3(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("std::range") {
+		BENCHMARK("ranges v3") {
+			return rangesv3(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = stdranges(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("flux ranges") {
+		BENCHMARK("std::range") {
+			return stdranges(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = fluxranges(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
+		BENCHMARK("flux ranges") {
+			return fluxranges(data, accept, max_items);
+		};
+	}
 }
 
 TEST_CASE("late single item", "") {
@@ -417,30 +489,48 @@ TEST_CASE("late single item", "") {
 	const std::vector<Out> expected = {
 		{0, 10000, "ryanperez"},
 	};
-	BENCHMARK("cc") {
+	{
 		const std::vector<Out> found = cc(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("algorithms") {
+		BENCHMARK("cc") {
+			return cc(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = algorithms(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("boost adaptors") {
+		BENCHMARK("algorithms") {
+			return algorithms(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = boost_adaptors(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("ranges v3") {
+		BENCHMARK("boost adaptors") {
+			return boost_adaptors(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = rangesv3(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("std::range") {
+		BENCHMARK("ranges v3") {
+			return rangesv3(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = stdranges(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
-	BENCHMARK("flux ranges") {
+		BENCHMARK("std::range") {
+			return stdranges(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = fluxranges(data, accept, max_items);
 		REQUIRE(found == expected);
-	};
+		BENCHMARK("flux ranges") {
+			return fluxranges(data, accept, max_items);
+		};
+	}
 }
 
 TEST_CASE("every other item", "") {
@@ -448,40 +538,58 @@ TEST_CASE("every other item", "") {
 	const auto data = parse(str);
 	auto accept = [=](const Data& d){return d.id % 2 == 0 && std::all_of(std::begin(d.connections), std::end(d.connections), [](std::string_view c){return c.length() > 1;});};
 	const size_t max_items = 9999;
-	BENCHMARK("cc") {
+	{
 		const std::vector<Out> found = cc(data, accept, max_items);
 		REQUIRE(found.size() == 5000);
 		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
 		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
-	};
-	BENCHMARK("algorithms") {
+		BENCHMARK("cc") {
+			return cc(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = algorithms(data, accept, max_items);
 		REQUIRE(found.size() == 5000);
 		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
 		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
-	};
-	BENCHMARK("boost adaptors") {
+		BENCHMARK("algorithms") {
+			return algorithms(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = boost_adaptors(data, accept, max_items);
 		REQUIRE(found.size() == 5000);
 		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
 		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
-	};
-	BENCHMARK("ranges v3") {
+		BENCHMARK("boost adaptors") {
+			return boost_adaptors(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = rangesv3(data, accept, max_items);
 		REQUIRE(found.size() == 5000);
 		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
 		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
-	};
-	BENCHMARK("std::range") {
+		BENCHMARK("ranges v3") {
+			return rangesv3(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = stdranges(data, accept, max_items);
 		REQUIRE(found.size() == 5000);
 		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
 		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
-	};
-	BENCHMARK("flux ranges") {
+		BENCHMARK("std::range") {
+			return stdranges(data, accept, max_items);
+		};
+	}
+	{
 		const std::vector<Out> found = fluxranges(data, accept, max_items);
 		REQUIRE(found.size() == 5000);
 		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
 		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
-	};
+		BENCHMARK("flux ranges") {
+			return fluxranges(data, accept, max_items);
+		};
+	}
 }
