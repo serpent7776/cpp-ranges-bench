@@ -6,20 +6,25 @@ data <- xmlParse(args[1])
 
 for (test_case in data["//TestCase"]) {
   test_case_name <- xpathSApply(test_case, "./@name", paste)
-  results <- xpathSApply(test_case, "./BenchmarkResults")
+  results <- xpathSApply(test_case, ".//BenchmarkResults")
   samples <- xpathSApply(test_case, ".//sample", xmlValue)
-  names <- xpathSApply(test_case, "./BenchmarkResults/@name", paste)
-  names <- rep(names, each = 100)
+  counts <- xpathSApply(test_case, ".//BenchmarkResults", function(r) {
+    xmlGetAttr(r, "samples", default = 0, converter = as.integer)
+  })
+  names <- xpathSApply(test_case, ".//BenchmarkResults/@name", paste)
+
+  if (length(names) == 0 || sum(counts) == 0) next
+  names <- rep(names, counts)
 
   df <- data.frame(
-    names = names,
+    methods = names,
     samples = as.numeric(samples)
   )
 
-  p <- ggplot(df, aes(x = names, y = samples, fill = names)) +
+  p <- ggplot(df, aes(x = methods, y = samples, fill = methods)) +
     geom_boxplot(size = 0.5, staplewidth = 0.5) +
-    theme_minimal() +
-    labs(x = "method", y = "times", title = test_case_name) +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+    labs(x = "Method", y = "Time [ns]", title = test_case_name, fill = "Method") +
     scale_y_continuous(limits = c(0, NA))
   print(p)
   test_case_name |>
