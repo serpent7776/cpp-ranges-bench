@@ -158,7 +158,7 @@ std::vector<Data> parse(std::string_view in)
 	return vec;
 }
 
-std::vector<Out> cc(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
+std::vector<Out> clike(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
 {
 	size_t idx = 0;
 	std::vector<Out> result;
@@ -274,11 +274,11 @@ TEST_CASE("all ismiths", "") {
 		{1, 827, "melanievance"},
 		{0, 708, "campbelljennifer"},
 	};
-	SECTION("cc") {
-		const std::vector<Out> found = cc(data, accept, max_items);
+	SECTION("clike") {
+		const std::vector<Out> found = clike(data, accept, max_items);
 		REQUIRE(found == expected);
-		BENCHMARK("cc") {
-			return cc(data, accept, max_items);
+		BENCHMARK("clike") {
+			return clike(data, accept, max_items);
 		};
 	}
 	SECTION("algorithms") {
@@ -331,11 +331,11 @@ TEST_CASE("5 ismiths", "") {
 		{1, 827, "melanievance"},
 		{0, 708, "campbelljennifer"},
 	};
-	SECTION("cc") {
-		const std::vector<Out> found = cc(data, accept, max_items);
+	SECTION("clike") {
+		const std::vector<Out> found = clike(data, accept, max_items);
 		REQUIRE(found == expected);
-		BENCHMARK("cc") {
-			return cc(data, accept, max_items);
+		BENCHMARK("clike") {
+			return clike(data, accept, max_items);
 		};
 	}
 	SECTION("algorithms") {
@@ -383,11 +383,11 @@ TEST_CASE("empty result set", "") {
 	const size_t max_items = 5;
 	const std::vector<Out> expected = {
 	};
-	SECTION("cc") {
-		const std::vector<Out> found = cc(data, accept, max_items);
+	SECTION("clike") {
+		const std::vector<Out> found = clike(data, accept, max_items);
 		REQUIRE(found == expected);
-		BENCHMARK("cc") {
-			return cc(data, accept, max_items);
+		BENCHMARK("clike") {
+			return clike(data, accept, max_items);
 		};
 	}
 	SECTION("algorithms") {
@@ -436,11 +436,11 @@ TEST_CASE("early single item", "") {
 	const std::vector<Out> expected = {
 		{0, 2, "elizabeth25"},
 	};
-	SECTION("cc") {
-		const std::vector<Out> found = cc(data, accept, max_items);
+	SECTION("clike") {
+		const std::vector<Out> found = clike(data, accept, max_items);
 		REQUIRE(found == expected);
-		BENCHMARK("cc") {
-			return cc(data, accept, max_items);
+		BENCHMARK("clike") {
+			return clike(data, accept, max_items);
 		};
 	}
 	SECTION("algorithms") {
@@ -489,11 +489,11 @@ TEST_CASE("late single item", "") {
 	const std::vector<Out> expected = {
 		{0, 10000, "ryanperez"},
 	};
-	SECTION("cc") {
-		const std::vector<Out> found = cc(data, accept, max_items);
+	SECTION("clike") {
+		const std::vector<Out> found = clike(data, accept, max_items);
 		REQUIRE(found == expected);
-		BENCHMARK("cc") {
-			return cc(data, accept, max_items);
+		BENCHMARK("clike") {
+			return clike(data, accept, max_items);
 		};
 	}
 	SECTION("algorithms") {
@@ -538,13 +538,13 @@ TEST_CASE("every other item", "") {
 	const auto data = parse(str);
 	auto accept = [=](const Data& d){return d.id % 2 == 0 && std::all_of(std::begin(d.connections), std::end(d.connections), [](std::string_view c){return c.length() > 1;});};
 	const size_t max_items = 9999;
-	SECTION("cc") {
-		const std::vector<Out> found = cc(data, accept, max_items);
+	SECTION("clike") { const std::vector<Out> found = clike(data, accept,
+		max_items);
 		REQUIRE(found.size() == 5000);
 		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
 		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
-		BENCHMARK("cc") {
-			return cc(data, accept, max_items);
+		BENCHMARK("clike") {
+			return clike(data, accept, max_items);
 		};
 	}
 	SECTION("algorithms") {
