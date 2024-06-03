@@ -13,3 +13,13 @@ lib/ranges-v3/build/:
 
 rangesv3: lib/ranges-v3/build/
 	${MAKE} -C lib/ranges-v3/build
+
+stats: read
+	: > stats
+	for t in clike algorithms boost_adaptors rangesv3 stdranges fluxranges; do \
+		perf stat -o stats --append ./read "early single item" -c $$t --skip-benchmarks ; \
+	done
+
+stats.sc: stats
+	stats.sc.pl < stats > stats.sc
+
