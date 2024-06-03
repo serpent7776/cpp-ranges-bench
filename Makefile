@@ -5,8 +5,13 @@ all: read plot
 
 read.o: lib/flux.hpp rangesv3
 
+test.o: lib/flux.hpp rangesv3
+
 read: Makefile read.o catch_amalgamated.o
 	${CXX} ${CFLAGS} ${CXXFLAGS} -o read read.o catch_amalgamated.o
+
+test: Makefile test.o catch_amalgamated.o
+	${CXX} ${CFLAGS} ${CXXFLAGS} -o test test.o catch_amalgamated.o
 
 lib/ranges-v3/build/:
 	cd lib/ranges-v3/ && mkdir -p build && cd build && cmake ../
