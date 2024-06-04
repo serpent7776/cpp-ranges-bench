@@ -243,7 +243,7 @@ std::vector<Out> stdranges(const std::vector<Data>& v, std::predicate<Data> auto
 
 std::vector<Out> fluxranges(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
 {
-	auto filtered = flux::from(std::move(v)).filter(accept).take(max_items);
+	auto filtered = flux::ref(v).filter(accept).take(max_items);
 	auto zipped = flux::zip(flux::ints(), std::move(filtered)).template to<std::vector>();
 	std::vector<Out> found = flux::from(std::move(zipped)).reverse().map([](const auto& it){
 		return Out{.n=uint64_t(std::get<0>(it)), .id=std::get<1>(it).id, .name=std::get<1>(it).name};
