@@ -1,6 +1,8 @@
 CXXFLAGS+=-std=c++23 -Wall -Wextra -pedantic -O2 -g -I lib/ranges-v3/include
 
-all: read plot
+all: read results.xml plot
+
+results.xml: read
 	./read --reporter xml > results.xml
 
 read.o: lib/flux.hpp rangesv3
@@ -29,7 +31,7 @@ stats.sc: stats
 	stats.sc.pl < stats > stats.sc
 
 .PHONY: plot
-plot: Rplots.pdf
+plot: results.xml Rplots.pdf
 
 Rplots.pdf: results.xml
 	Rscript plot.r results.xml
