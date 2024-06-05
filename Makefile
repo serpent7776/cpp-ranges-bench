@@ -28,7 +28,7 @@ stats: read
 	done
 
 stats.sc: stats
-	stats.sc.pl < stats > stats.sc
+	./stats.sc.pl < stats > stats.sc
 
 .PHONY: plot
 plot: results.xml Rplots.pdf
