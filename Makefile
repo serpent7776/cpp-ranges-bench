@@ -30,6 +30,12 @@ stats: read
 stats.sc: stats
 	./stats.sc.pl < stats > stats.sc
 
+.PHONY: cachegrind
+cachegrind: read
+	for t in clike algorithms boost_adaptors rangesv3 stdranges fluxranges; do \
+		valgrind --tool=cachegrind --instr-at-start=no ./read 'early single item' -c $$t --skip-benchmarks; \
+	done
+
 .PHONY: plot
 plot: results.xml Rplots.pdf
 
