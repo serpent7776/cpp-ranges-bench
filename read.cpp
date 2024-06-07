@@ -540,8 +540,8 @@ TEST_CASE("every other item", "") {
 	const auto data = parse(str);
 	auto accept = [=](const Data& d){return d.id % 2 == 0 && std::all_of(std::begin(d.connections), std::end(d.connections), [](std::string_view c){return c.length() > 1;});};
 	const size_t max_items = 9999;
-	SECTION("clike") { const std::vector<Out> found = clike(data, accept,
-		max_items);
+	SECTION("clike") {
+		const std::vector<Out> found = clike(data, accept, max_items);
 		REQUIRE(found.size() == 5000);
 		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
 		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
