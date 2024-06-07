@@ -214,12 +214,13 @@ std::vector<Out> boost_adaptors(const std::vector<Data>& v, std::predicate<Data>
 std::vector<Out> rangesv3(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
 {
 	namespace rv = ranges::views;
-	namespace ra = ranges::action;
+	namespace ra = ranges::actions;
 
-	const auto r = v | rv::remove_if(ranges::not_fn(accept)) | rv::take(max_items) | rv::enumerate | ranges::to_vector | ra::reverse;
-	std::vector<Out> found = r | ranges::views::transform([](const auto& it){
+	auto r = v | rv::remove_if(ranges::not_fn(accept)) | rv::take(max_items) | rv::enumerate;
+	std::vector<Out> found = std::move(r) | ranges::views::transform([](const auto& it){
 		return Out{.n=it.first, .id=it.second.id, .name=it.second.name};
 	}) | ranges::to_vector;
+	std::reverse(std::begin(found), std::end(found));
 	return found;
 }
 
@@ -235,19 +236,20 @@ std::vector<Out> stdranges(const std::vector<Data>& v, std::predicate<Data> auto
 {
 	namespace rv = std::ranges::views;
 
-	std::vector<Out> found = into(v | rv::filter(accept) | rv::take(max_items) | rv::enumerate) | rv::reverse | rv::transform([](const auto& it){
+	std::vector<Out> found = v | rv::filter(accept) | rv::take(max_items) | rv::enumerate | rv::transform([](const auto& it){
 		return Out{.n=uint64_t(std::get<0>(it)), .id=std::get<1>(it).id, .name=std::get<1>(it).name};
 	}) | ranges::to_vector;
+	std::reverse(std::begin(found), std::end(found));
 	return found;
 }
 
 std::vector<Out> fluxranges(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
 {
-	auto filtered = flux::ref(v).filter(accept).take(max_items);
-	auto zipped = flux::zip(flux::ints(), std::move(filtered)).template to<std::vector>();
-	std::vector<Out> found = flux::from(std::move(zipped)).reverse().map([](const auto& it){
-		return Out{.n=uint64_t(std::get<0>(it)), .id=std::get<1>(it).id, .name=std::get<1>(it).name};
-	}).template to<std::vector>();
+	auto found = flux::zip(flux::ints(), flux::ref(v).filter(accept).take(max_items))
+		.map([](const auto& it){
+			return Out{.n=uint64_t(std::get<0>(it)), .id=std::get<1>(it).id, .name=std::get<1>(it).name};
+		}).template to<std::vector>();
+	flux::inplace_reverse(found);
 	return found;
 }
 
