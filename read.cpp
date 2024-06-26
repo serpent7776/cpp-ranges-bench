@@ -20,12 +20,10 @@
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/range/algorithm/copy.hpp>
 
-#include "range/v3/action/reverse.hpp"
 #include "range/v3/functional/not_fn.hpp"
 #include "range/v3/view/enumerate.hpp"
-#include "range/v3/view/filter.hpp"
-#include "range/v3/view/reverse.hpp"
 #include "range/v3/view/take.hpp"
+#include "range/v3/view/remove_if.hpp"
 #include "range/v3/view/transform.hpp"
 
 #include "lib/flux.hpp"
@@ -214,7 +212,6 @@ std::vector<Out> boost_adaptors(const std::vector<Data>& v, std::predicate<Data>
 std::vector<Out> rangesv3(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
 {
 	namespace rv = ranges::views;
-	namespace ra = ranges::actions;
 
 	auto r = v | rv::remove_if(ranges::not_fn(accept)) | rv::take(max_items) | rv::enumerate;
 	std::vector<Out> found = std::move(r) | ranges::views::transform([](const auto& it){
@@ -222,14 +219,6 @@ std::vector<Out> rangesv3(const std::vector<Data>& v, std::predicate<Data> auto 
 	}) | ranges::to_vector;
 	std::reverse(std::begin(found), std::end(found));
 	return found;
-}
-
-template<typename Range, typename Container = std::vector<std::ranges::range_value_t<Range>>>
-Container into(Range&& range) {
-	Container result;
-	// result.reserve(std::ranges::size(range));
-	std::ranges::copy(range, std::back_inserter(result));
-	return result;
 }
 
 std::vector<Out> stdranges(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
