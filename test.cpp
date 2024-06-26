@@ -30,6 +30,12 @@
 
 #include "lib/flux.hpp"
 
+#include "lib/cppitertools/cppitertools/imap.hpp"
+#include "lib/cppitertools/cppitertools/enumerate.hpp"
+#include "lib/cppitertools/cppitertools/filter.hpp"
+#include "lib/cppitertools/cppitertools/reversed.hpp"
+#include "lib/cppitertools/cppitertools/slice.hpp"
+
 #include "catch_amalgamated.hpp"
 
 struct Data
@@ -248,6 +254,18 @@ std::vector<Out> fluxranges(const std::vector<Data>& v, std::predicate<Data> aut
 	std::vector<Out> found = flux::from(std::move(zipped)).reverse().map([](const auto& it){
 		return Out{.n=uint64_t(std::get<0>(it)), .id=std::get<1>(it).id, .name=std::get<1>(it).name};
 	}).template to<std::vector>();
+	return found;
+}
+
+std::vector<Out> cppitertools(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
+{
+	auto pipe = iter::imap([](const auto& it){
+		return Out{.n=uint64_t(std::get<0>(it)), .id=std::get<1>(it).id, .name=std::get<1>(it).name};
+	}, iter::enumerate(iter::slice(iter::filter(accept, v), 0uz, max_items)));
+	std::vector<Out> found;
+	found.reserve(std::min(max_items, v.size()));
+	for (auto it : pipe) found.push_back(it);
+	std::reverse(std::begin(found), std::end(found));
 	return found;
 }
 
@@ -40720,9 +40738,11 @@ TEST_CASE("exhaustive check", "") {
 	const std::vector<Out> found_rangesv3 = rangesv3(data, accept, max_items);
 	const std::vector<Out> found_stdranges = stdranges(data, accept, max_items);
 	const std::vector<Out> found_fluxranges = fluxranges(data, accept, max_items);
+	const std::vector<Out> found_cppitertools = cppitertools(data, accept, max_items);
 	REQUIRE(found_cc == found_algorithms);
 	REQUIRE(found_algorithms == found_boost_adaptors);
 	REQUIRE(found_boost_adaptors == found_rangesv3);
 	REQUIRE(found_rangesv3 == found_stdranges);
 	REQUIRE(found_stdranges == found_fluxranges);
+	REQUIRE(found_fluxranges == found_cppitertools);
 }
