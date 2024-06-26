@@ -28,6 +28,12 @@
 
 #include "lib/flux.hpp"
 
+#include "lib/cppitertools/cppitertools/imap.hpp"
+#include "lib/cppitertools/cppitertools/enumerate.hpp"
+#include "lib/cppitertools/cppitertools/filter.hpp"
+#include "lib/cppitertools/cppitertools/reversed.hpp"
+#include "lib/cppitertools/cppitertools/slice.hpp"
+
 #include "catch_amalgamated.hpp"
 
 struct Data
@@ -242,6 +248,18 @@ std::vector<Out> fluxranges(const std::vector<Data>& v, std::predicate<Data> aut
 	return found;
 }
 
+std::vector<Out> cppitertools(const std::vector<Data>& v, std::predicate<Data> auto accept, size_t max_items)
+{
+	auto pipe = iter::imap([](const auto& it){
+		return Out{.n=uint64_t(std::get<0>(it)), .id=std::get<1>(it).id, .name=std::get<1>(it).name};
+	}, iter::enumerate(iter::slice(iter::filter(accept, v), 0uz, max_items)));
+	std::vector<Out> found;
+	found.reserve(std::min(max_items, v.size()));
+	for (auto it : pipe) found.push_back(it);
+	std::reverse(std::begin(found), std::end(found));
+	return found;
+}
+
 TEST_CASE("all ismiths", "") {
 	const auto needle = "ismith";
 	const auto str = read_file("data.csv");
@@ -307,6 +325,13 @@ TEST_CASE("all ismiths", "") {
 			return fluxranges(data, accept, max_items);
 		};
 	}
+	SECTION("cppitertools") {
+		const std::vector<Out> found = cppitertools(data, accept, max_items);
+		REQUIRE(found == expected);
+		BENCHMARK("cppitertools") {
+			return cppitertools(data, accept, max_items);
+		};
+	}
 }
 
 TEST_CASE("5 ismiths", "") {
@@ -364,6 +389,13 @@ TEST_CASE("5 ismiths", "") {
 			return fluxranges(data, accept, max_items);
 		};
 	}
+	SECTION("cppitertools") {
+		const std::vector<Out> found = cppitertools(data, accept, max_items);
+		REQUIRE(found == expected);
+		BENCHMARK("cppitertools") {
+			return cppitertools(data, accept, max_items);
+		};
+	}
 }
 
 TEST_CASE("empty result set", "") {
@@ -414,6 +446,13 @@ TEST_CASE("empty result set", "") {
 		REQUIRE(found == expected);
 		BENCHMARK("flux ranges") {
 			return fluxranges(data, accept, max_items);
+		};
+	}
+	SECTION("cppitertools") {
+		const std::vector<Out> found = cppitertools(data, accept, max_items);
+		REQUIRE(found == expected);
+		BENCHMARK("cppitertools") {
+			return cppitertools(data, accept, max_items);
 		};
 	}
 }
@@ -469,6 +508,13 @@ TEST_CASE("early single item", "") {
 			return fluxranges(data, accept, max_items);
 		};
 	}
+	SECTION("cppitertools") {
+		const std::vector<Out> found = cppitertools(data, accept, max_items);
+		REQUIRE(found == expected);
+		BENCHMARK("cppitertools") {
+			return cppitertools(data, accept, max_items);
+		};
+	}
 }
 
 TEST_CASE("late single item", "") {
@@ -520,6 +566,13 @@ TEST_CASE("late single item", "") {
 		REQUIRE(found == expected);
 		BENCHMARK("flux ranges") {
 			return fluxranges(data, accept, max_items);
+		};
+	}
+	SECTION("cppitertools") {
+		const std::vector<Out> found = cppitertools(data, accept, max_items);
+		REQUIRE(found == expected);
+		BENCHMARK("cppitertools") {
+			return cppitertools(data, accept, max_items);
 		};
 	}
 }
@@ -581,6 +634,15 @@ TEST_CASE("every other item", "") {
 		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
 		BENCHMARK("flux ranges") {
 			return fluxranges(data, accept, max_items);
+		};
+	}
+	SECTION("cppitertools") {
+		const std::vector<Out> found = cppitertools(data, accept, max_items);
+		REQUIRE(found.size() == 5000);
+		REQUIRE(found[0] == Out{.n=4999, .id=10000, .name="ryanperez"});
+		REQUIRE(found[4999] == Out{.n=0, .id=2, .name="elizabeth25"});
+		BENCHMARK("cppitertools") {
+			return cppitertools(data, accept, max_items);
 		};
 	}
 }
