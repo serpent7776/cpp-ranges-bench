@@ -255,7 +255,7 @@ std::vector<Out> cppitertools(const std::vector<Data>& v, std::predicate<Data> a
 	}, iter::enumerate(iter::slice(iter::filter(accept, v), 0uz, max_items)));
 	std::vector<Out> found;
 	found.reserve(std::min(max_items, v.size()));
-	for (auto it : pipe) found.push_back(it);
+	for (auto&& it : pipe) found.push_back(std::move(it));
 	std::reverse(std::begin(found), std::end(found));
 	return found;
 }
